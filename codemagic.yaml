@@ -6,31 +6,31 @@ workflows:
       xcode: latest
       vars:
         APP_NAME: "ChatZeus"
+    # --- جديد: قسم التوقيع والنشر ---
+    publishing:
+      xcode:
+        # هذه الطريقة تجبر Codemagic على إنشاء توقيع تلقائي
+        # وهو ما نحتاجه للحصول على ملف IPA
+        provisioning_profile_type: AD_HOC
+    # ---------------------------------
     scripts:
       - name: Install dependencies
         script: | 
-          echo "--- Installing xcode-project-gen ---"
           brew install xcode-project-gen
-          echo "--- Installation complete ---"
       - name: Create Xcode Project
         script: | 
-          echo "--- Creating Xcode project for $APP_NAME ---"
           xcode-project-gen --name "$APP_NAME" --type app --interface swiftui --assets "ChatZeus-iOS/icon.png"
-          echo "--- Xcode project created successfully ---"
       - name: Build and Export IPA
         script: | 
-          echo "--- Starting archive process ---"
           xcodebuild -project "$APP_NAME.xcodeproj" \
                      -scheme "$APP_NAME" \
                      -sdk iphoneos \
                      -configuration Release \
                      archive -archivePath "$CM_BUILD_DIR/build/$APP_NAME.xcarchive"
           
-          echo "--- Starting export process ---"
           xcodebuild -exportArchive \
                      -archivePath "$CM_BUILD_DIR/build/$APP_NAME.xcarchive" \
                      -exportPath "$CM_BUILD_DIR/build/export" \
                      -exportOptionsPlist /Users/builder/exportOptions.plist
-          echo "--- IPA exported successfully ---"
     artifacts:
       - $CM_BUILD_DIR/build/export/*.ipa
