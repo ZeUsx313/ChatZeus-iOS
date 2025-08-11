@@ -1,0 +1,24 @@
+workflows:
+  ios-app:
+    name: Build iOS App
+    instance_type: mac_mini_m1
+    environment:
+      xcode: latest
+    scripts:
+      - name: Create Xcode Project
+        script: | 
+          xcode-project-gen --name ChatZeus-iOS --type app --interface swiftui
+      - name: Build and Export IPA
+        script: | 
+          xcodebuild -project "ChatZeus-iOS.xcodeproj" \
+                     -scheme "ChatZeus-iOS" \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     archive -archivePath $CM_BUILD_DIR/build/ChatZeus-iOS.xcarchive
+          
+          xcodebuild -exportArchive \
+                     -archivePath $CM_BUILD_DIR/build/ChatZeus-iOS.xcarchive \
+                     -exportPath $CM_BUILD_DIR/build/export \
+                     -exportOptionsPlist /Users/builder/exportOptions.plist
+    artifacts:
+      - $CM_BUILD_DIR/build/export/*.ipa
