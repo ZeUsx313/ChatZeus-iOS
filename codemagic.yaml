@@ -6,13 +6,10 @@ workflows:
       xcode: latest
       vars:
         APP_NAME: "ChatZeus"
-    # --- جديد: قسم التوقيع والنشر ---
-    publishing:
-      xcode:
-        # هذه الطريقة تجبر Codemagic على إنشاء توقيع تلقائي
-        # وهو ما نحتاجه للحصول على ملف IPA
+      # --- هذا هو المكان الصحيح لإعدادات التوقيع ---
+      ios_signing:
         provisioning_profile_type: AD_HOC
-    # ---------------------------------
+    # ---------------------------------------------
     scripts:
       - name: Install dependencies
         script: | 
